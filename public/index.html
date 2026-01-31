@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Гра з коробками</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <h1>Обери одну коробку</h1>
+  <p>Можна зіграти лише один раз</p>
+
+  <input id="username" placeholder="Введи своє імʼя">
+
+  <div class="boxes" id="boxes"></div>
+
+  <h2>Результати</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Імʼя користувача</th>
+        <th>Приз</th>
+        <th>Дата</th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
+
+  <button id="resetBtn" class="admin-reset">🗑 Admin Reset</button>
+
+  <h3>Статистика</h3>
+  <ul id="stats"></ul>
+
+  <div class="modal" id="modal">
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+  <script src="./main.js"></script>
+</body>
+</html>
