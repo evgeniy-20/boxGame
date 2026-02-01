@@ -28,10 +28,12 @@ const prizes = [
   { img: "images/масло.webp", title: "20 масла" },
   { img: "images/пила.webp", title: "50 пил передати " },
   { img: "images/свіжа паста.webp", title: "50 свіжої пасти" },
-  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки передати Богдані" },
-  { img: "images/пила.webp", title: "50 пил передати Богдані" },
-  { img: "images/свіжа паста.webp", title: "50 свіжої пасти передати Богдані" },
+  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки передати Наталі" },
+  { img: "images/пила.webp", title: "50 пил передати Анастасії" },
+  { img: "images/свіжа паста.webp", title: "50 свіжої пасти передати Владі" },
   { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки" },
+  { img: "images/лопата.webp", title: "20 лопат" },
+  { img: "images/лопата.webp", title: "20 лопат передати Тетяні" },
 ];
 
 // ===== MIDDLEWARE =====
