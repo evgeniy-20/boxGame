@@ -9,10 +9,11 @@ const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = "dev123";
 
 // ===== TELEGRAM =====
-const TG_TOKEN = "ВСТАВ_СВІЙ_BOT_TOKEN";
-const CHAT_ID = "ВСТАВ_СВІЙ_CHAT_ID";
+const TG_TOKEN = "8313933859:AAHcTq4kbxCqXGLi-DWDilyFUzhKzkGGA-c";
+const CHAT_ID = "561860670";
 
-const bot = new TelegramBot(TG_TOKEN);
+const bot = new TelegramBot(TG_TOKEN, { polling: false });
+
 
 // ===== FILE =====
 const DATA_FILE = path.join(__dirname, 'data.json');
@@ -26,20 +27,7 @@ const prizes = [
   { img: "images/мед.webp", title: "20 меду" },
   { img: "images/масло.webp", title: "20 масла" },
   { img: "images/пила.webp", title: "50 пил" },
-  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші" },
-  { img: "images/панелі", title: "20 панелів" },
-  { img: "images/Plank.webp", title: "20 дошок передати Наталі" },
-  { img: "images/білий цукор.webp", title: "50 білого цукру передати Тетяні" },
-  { img: "images/лимонний крем.webp", title: "20 лимонного крему передати Владі" },
-  { img: "images/мед.webp", title: "20 меду передати Олі" },
-  { img: "images/масло.webp", title: "20 масла передати Діанкі" },
-  { img: "images/пила.webp", title: "50 пил передати Миколі" },
-  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші передати Саші" },
-  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки передати Олі" },
-  { img: "images/молоко.webp", title: "20 молока передати Діанкі" },
-  { img: "images/шоколад.webp", title: "50 шоколаду передати Ярику" },
-  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші передати Віталіні" },
-  { img: "images/пір\`я.webp", title: "20 пір'я передати Магді" },
+  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші" }
 ];
 
 // ===== MIDDLEWARE =====

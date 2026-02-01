@@ -1,24 +1,16 @@
 {
   "boxes": [
     {
-      "img": "images/мед.webp",
-      "title": "20 меду"
+      "img": "images/пила.webp",
+      "title": "50 пил"
     },
     {
       "img": "images/Plank.webp",
       "title": "20 дошок"
     },
     {
-      "img": "images/пила.webp",
-      "title": "50 пил"
-    },
-    {
-      "img": "images/Bacon.webp",
-      "title": "50 бекону"
-    },
-    {
-      "img": "images/білий цукор.webp",
-      "title": "50 лопат"
+      "img": "images/лимонний крем.webp",
+      "title": "20 лимонного крему"
     },
     {
       "img": "images/свіжа лопша.webp",
@@ -29,16 +21,24 @@
       "title": "20 масла"
     },
     {
-      "img": "images/лимонний крем.webp",
-      "title": "20 лимонного крему"
+      "img": "images/Bacon.webp",
+      "title": "50 бекону"
+    },
+    {
+      "img": "images/білий цукор.webp",
+      "title": "50 лопат"
+    },
+    {
+      "img": "images/мед.webp",
+      "title": "20 меду"
     }
   ],
   "results": [
     {
       "name": "Yevhen",
-      "prize": "20 дошок",
-      "img": "images/Plank.webp",
-      "date": "31.01.2026, 19:44:49"
+      "prize": "20 меду",
+      "img": "images/мед.webp",
+      "date": "01.02.2026, 14:01:35"
     }
   ]
 }
