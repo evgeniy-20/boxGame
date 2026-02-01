@@ -2,14 +2,22 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
+const TelegramBot = require('node-telegram-bot-api');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const ADMIN_PASSWORD = "dev123";
 
+// ===== TELEGRAM =====
+const TG_TOKEN = "ВСТАВ_СВІЙ_BOT_TOKEN";
+const CHAT_ID = "ВСТАВ_СВІЙ_CHAT_ID";
+
+const bot = new TelegramBot(TG_TOKEN);
+
+// ===== FILE =====
 const DATA_FILE = path.join(__dirname, 'data.json');
 
-// --- PRIZES --- //
+// ===== PRIZES =====
 const prizes = [
   { img: "images/Bacon.webp", title: "50 бекону" },
   { img: "images/Plank.webp", title: "20 дошок" },
@@ -18,16 +26,31 @@ const prizes = [
   { img: "images/мед.webp", title: "20 меду" },
   { img: "images/масло.webp", title: "20 масла" },
   { img: "images/пила.webp", title: "50 пил" },
-  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші" }
+  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші" },
+  { img: "images/панелі", title: "20 панелів" },
+  { img: "images/Plank.webp", title: "20 дошок передати Наталі" },
+  { img: "images/білий цукор.webp", title: "50 білого цукру передати Тетяні" },
+  { img: "images/лимонний крем.webp", title: "20 лимонного крему передати Владі" },
+  { img: "images/мед.webp", title: "20 меду передати Олі" },
+  { img: "images/масло.webp", title: "20 масла передати Діанкі" },
+  { img: "images/пила.webp", title: "50 пил передати Миколі" },
+  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші передати Саші" },
+  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки передати Олі" },
+  { img: "images/молоко.webp", title: "20 молока передати Діанкі" },
+  { img: "images/шоколад.webp", title: "50 шоколаду передати Ярику" },
+  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші передати Віталіні" },
+  { img: "images/пір\`я.webp", title: "20 пір'я передати Магді" },
 ];
 
-// --- MIDDLEWARE --- //
+// ===== MIDDLEWARE =====
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// --- UTILS --- //
+// ===== UTILS =====
 function loadData() {
-  if (!fs.existsSync(DATA_FILE)) return { boxes: [], results: [] };
+  if (!fs.existsSync(DATA_FILE)) {
+    return { boxes: [], results: [] };
+  }
   return JSON.parse(fs.readFileSync(DATA_FILE));
 }
 
@@ -43,34 +66,47 @@ function shuffleArray(arr) {
   return arr;
 }
 
-// --- INIT BOXES --- //
+// ===== INIT BOXES =====
 function initBoxes() {
   const data = loadData();
+
   if (!data.boxes || data.boxes.length === 0) {
     data.boxes = shuffleArray([...prizes]).slice(0, 8);
     saveData(data);
   }
 }
+
 initBoxes();
 
-// --- API ROUTES --- //
+// ===== API =====
+
+// GET BOXES
 app.get('/api/boxes', (req, res) => {
   const data = loadData();
   res.json(data.boxes);
 });
 
+// GET RESULTS
 app.get('/api/results', (req, res) => {
   const data = loadData();
   res.json(data.results);
 });
 
+// OPEN BOX
 app.post('/api/open', (req, res) => {
+
   const { username, index } = req.body;
-  if (!username || index === undefined) return res.status(400).send('Invalid request');
+
+  if (!username || index === undefined) {
+    return res.status(400).send('Invalid request');
+  }
 
   const data = loadData();
   const prize = data.boxes[index];
-  if (!prize) return res.status(400).send('Коробка не існує');
+
+  if (!prize) {
+    return res.status(400).send('Коробка не існує');
+  }
 
   const result = {
     name: username,
@@ -82,17 +118,41 @@ app.post('/api/open', (req, res) => {
   data.results.push(result);
   saveData(data);
 
+  // ===== TELEGRAM MESSAGE =====
+  bot.sendMessage(CHAT_ID,
+`🎁 ВІДКРИТА КОРОБКА
+
+👤 Імʼя: ${username}
+🏆 Приз: ${prize.title}
+📦 Коробка: №${Number(index) + 1}
+🕒 ${result.date}`
+  ).catch(err => console.log("TG ERROR:", err.message));
+
   res.json(prize);
 });
 
+// RESET
 app.post('/api/reset', (req, res) => {
-  const { password } = req.body;
-  if (password !== ADMIN_PASSWORD) return res.status(403).send('Wrong password');
 
-  const data = { boxes: shuffleArray([...prizes]).slice(0, 8), results: [] };
+  const { password } = req.body;
+
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(403).send('Wrong password');
+  }
+
+  const data = {
+    boxes: shuffleArray([...prizes]).slice(0, 8),
+    results: []
+  };
+
   saveData(data);
-  res.send('Reset done, boxes shuffled!');
+
+  bot.sendMessage(CHAT_ID, "♻ Адмін скинув гру та перемішав коробки");
+
+  res.send('Reset done!');
 });
 
-// --- START SERVER --- //
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+// ===== START =====
+app.listen(PORT, () => {
+  console.log(`SERVER STARTED → http://localhost:${PORT}`);
+});
