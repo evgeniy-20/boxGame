@@ -22,12 +22,16 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const prizes = [
   { img: "images/Bacon.webp", title: "50 бекону" },
   { img: "images/Plank.webp", title: "20 дошок" },
-  { img: "images/білий цукор.webp", title: "50 лопат" },
+  { img: "images/білий цукор.webp", title: "50 білого цукру" },
   { img: "images/лимонний крем.webp", title: "20 лимонного крему" },
   { img: "images/мед.webp", title: "20 меду" },
   { img: "images/масло.webp", title: "20 масла" },
-  { img: "images/пила.webp", title: "50 пил" },
-  { img: "images/свіжа паста.webp", title: "50 свіжої пасти" }
+  { img: "images/пила.webp", title: "50 пил передати " },
+  { img: "images/свіжа паста.webp", title: "50 свіжої пасти" },
+  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки передати Богдані" },
+  { img: "images/пила.webp", title: "50 пил передати Богдані" },
+  { img: "images/свіжа паста.webp", title: "50 свіжої пасти передати Богдані" },
+  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки" },
 ];
 
 // ===== MIDDLEWARE =====

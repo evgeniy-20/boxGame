@@ -2,43 +2,36 @@
   "boxes": [
     {
       "img": "images/пила.webp",
-      "title": "50 пил"
-    },
-    {
-      "img": "images/Plank.webp",
-      "title": "20 дошок"
+      "title": "50 пил передати Богдані"
     },
     {
       "img": "images/лимонний крем.webp",
       "title": "20 лимонного крему"
     },
     {
-      "img": "images/свіжа лопша.webp",
-      "title": "50 свіжої лопші"
+      "img": "images/клейкова стрічка.webp",
+      "title": "20 клейкової стрічки"
     },
     {
-      "img": "images/масло.webp",
-      "title": "20 масла"
+      "img": "images/білий цукор.webp",
+      "title": "50 білого цукру"
     },
     {
       "img": "images/Bacon.webp",
       "title": "50 бекону"
     },
     {
-      "img": "images/білий цукор.webp",
-      "title": "50 лопат"
+      "img": "images/клейкова стрічка.webp",
+      "title": "20 клейкової стрічки передати Богдані"
     },
     {
-      "img": "images/мед.webp",
-      "title": "20 меду"
+      "img": "images/свіжа паста.webp",
+      "title": "50 свіжої пасти"
+    },
+    {
+      "img": "images/Plank.webp",
+      "title": "20 дошок"
     }
   ],
-  "results": [
-    {
-      "name": "Yevhen",
-      "prize": "20 меду",
-      "img": "images/мед.webp",
-      "date": "01.02.2026, 14:01:35"
-    }
-  ]
+  "results": []
 }
