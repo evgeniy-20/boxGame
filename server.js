@@ -27,7 +27,7 @@ const prizes = [
   { img: "images/мед.webp", title: "20 меду" },
   { img: "images/масло.webp", title: "20 масла" },
   { img: "images/пила.webp", title: "50 пил" },
-  { img: "images/свіжа лопша.webp", title: "50 свіжої лопші" }
+  { img: "images/свіжа паста.webp", title: "50 свіжої пасти" }
 ];
 
 // ===== MIDDLEWARE =====
