@@ -1,37 +1,4 @@
 {
-  "boxes": [
-    {
-      "img": "images/пила.webp",
-      "title": "50 пил передати Богдані"
-    },
-    {
-      "img": "images/лимонний крем.webp",
-      "title": "20 лимонного крему"
-    },
-    {
-      "img": "images/клейкова стрічка.webp",
-      "title": "20 клейкової стрічки"
-    },
-    {
-      "img": "images/білий цукор.webp",
-      "title": "50 білого цукру"
-    },
-    {
-      "img": "images/Bacon.webp",
-      "title": "50 бекону"
-    },
-    {
-      "img": "images/клейкова стрічка.webp",
-      "title": "20 клейкової стрічки передати Богдані"
-    },
-    {
-      "img": "images/свіжа паста.webp",
-      "title": "50 свіжої пасти"
-    },
-    {
-      "img": "images/Plank.webp",
-      "title": "20 дошок"
-    }
-  ],
+  "boxes": [],
   "results": []
 }

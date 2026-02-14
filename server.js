@@ -1,46 +1,210 @@
-const express = require('express');
-const fs = require('fs');
-const path = require('path');
-const bodyParser = require('body-parser');
-const TelegramBot = require('node-telegram-bot-api');
+require("dotenv").config();
+
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
+const bodyParser = require("body-parser");
+const TelegramBot = require("node-telegram-bot-api");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_PASSWORD = "dev123";
 
-// ===== TELEGRAM =====
-const TG_TOKEN = "8313933859:AAHcTq4kbxCqXGLi-DWDilyFUzhKzkGGA-c";
-const CHAT_ID = "561860670";
-
-const bot = new TelegramBot(TG_TOKEN, { polling: false });
-
-
-// ===== FILE =====
-const DATA_FILE = path.join(__dirname, 'data.json');
-
-// ===== PRIZES =====
-const prizes = [
-  { img: "images/Bacon.webp", title: "50 бекону" },
-  { img: "images/Plank.webp", title: "20 дошок" },
-  { img: "images/білий цукор.webp", title: "50 білого цукру" },
-  { img: "images/лимонний крем.webp", title: "20 лимонного крему" },
-  { img: "images/мед.webp", title: "20 меду" },
-  { img: "images/масло.webp", title: "20 масла" },
-  { img: "images/пила.webp", title: "50 пил передати " },
-  { img: "images/свіжа паста.webp", title: "50 свіжої пасти" },
-  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки передати Наталі" },
-  { img: "images/пила.webp", title: "50 пил передати Анастасії" },
-  { img: "images/свіжа паста.webp", title: "50 свіжої пасти передати Владі" },
-  { img: "images/клейкова стрічка.webp", title: "20 клейкової стрічки" },
-  { img: "images/лопата.webp", title: "20 лопат" },
-  { img: "images/лопата.webp", title: "20 лопат передати Тетяні" },
-];
-
-// ===== MIDDLEWARE =====
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static("public"));
 
-// ===== UTILS =====
+const DATA_FILE = path.join(__dirname, "data.json");
+
+/* ===== TELEGRAM ===== */
+
+const bot = new TelegramBot(process.env.TG_TOKEN);
+const CHAT_ID = process.env.CHAT_ID;
+
+async function sendToTelegram(text) {
+  try {
+    await bot.sendMessage(CHAT_ID, text);
+  } catch (err) {
+    console.log("Telegram error:", err.message);
+  }
+}
+
+/* ===== TELEGRAM TEXTS ===== */
+
+const tgTranslations = {
+  ua: {
+    opened: "🎁 Відкрита коробка!",
+    level: "⭐ Рівень",
+    prizes: "🏆 Призи",
+    date: "📅 Дата"
+  },
+  en: {
+    opened: "🎁 Box opened!",
+    level: "⭐ Level",
+    prizes: "🏆 Prizes",
+    date: "📅 Date"
+  },
+  ru: {
+    opened: "🎁 Коробка открыта!",
+    level: "⭐ Уровень",
+    prizes: "🏆 Призы",
+    date: "📅 Дата"
+  }
+};
+
+/* ===== PRIZES ===== */
+
+const prizesByLevel = {
+  50: [
+    {
+      img: "level to 50/яблучне варення.webp", title: { ua: "10 яблучного варення", en: "10 apple jam", ru: "10 яблочного варенья" }
+    },
+    {
+      img: "level to 50/шоколадне морозиво.webp", title: { ua: "10 шоколадного морозива", en: "10 chocolate ice cream", ru: "10 шоколадного мороженого" }
+    },
+    {
+      img: "level to 50/цвяхи.webp", title: { ua: "10 цвяхів", en: "10 nails", ru: "10 гвоздей" }
+    },
+    {
+      img: "level to 50/тканина.webp", title: { ua: "10 тканини", en: "10 fabric", ru: "10 тканины" }
+    },
+    {
+      img: "level to 50/сокира.webp", title: { ua: "10 сокир", en: "10 axes", ru: "10 топоров" }
+    },
+    {
+      img: "level to 50/сметана.webp", title: { ua: "10 сметани", en: "10 cream", ru: "10 сметаны" }
+    },
+    {
+      img: "level to 50/сир.webp", title: { ua: "10 сиру", en: "10 cheese", ru: "10 сыра" }
+    },
+    {
+      img: "level to 50/сир фета.webp", title: { ua: "10 сиру фета", en: "10 feta cheese", ru: "10 фета сыра" }
+    },
+    {
+      img: "level to 50/раки.webp", title: { ua: "10 раків", en: "10 crabs", ru: "10 раков" }
+    },
+    {
+      img: "level to 50/пила.webp", title: { ua: "10 пил", en: "10 saws", ru: "10 пилов" }
+    },
+    {
+      img: "level to 50/печево.webp", title: { ua: "10 печева", en: "10 cakes", ru: "10 печенья" }
+    },
+    {
+      img: "level to 50/панелі.webp", title: { ua: "10 панелей", en: "10 panels", ru: "10 панелей" }
+    },
+    {
+      img: "level to 50/ожинове варення.webp", title: { ua: "10 ожинового варення", en: "10 quince jam", ru: "10 ежевичного варенья" }
+    },
+    {
+      img: "level to 50/молоко.webp", title: { ua: "30 молока", en: "30 milk", ru: "30 молока" }
+    },
+    {
+      img: "level to 50/мед.webp", title: { ua: "30 меду", en: "30 honey", ru: "30 меда" }
+    },
+    {
+      img: "level to 50/масло.webp", title: { ua: "30 масла", en: "30 butter", ru: "30 масла" }
+    },
+    {
+      img: "level to 50/лопата.webp", title: { ua: "20 лопат", en: "20 shovels", ru: "20 лопат" }
+    },
+    {
+      img: "level to 50/коричневий цукор.webp", title: { ua: "30 коричневого цукру", en: "30 brown sugar", ru: "30 коричневого сахара" }
+    },
+    {
+      img: "level to 50/клейкова стрічка.webp", title: { ua: "10 клейкової стрічки", en: "10 packing tape", ru: "10 лент" }
+    },
+    {
+      img: "level to 50/качине перо.webp", title: { ua: "10 пір\`я", en: "10 duck feathers", ru: "10 перьев" }
+    },
+    {
+      img: "level to 50/Віск.webp", title: { ua: "10 віску", en: "10 wax", ru: "10 воска" }
+    },
+    {
+      img: "level to 50/білий цукор.webp", title: { ua: "10 білого цукру", en: "10 white sugar", ru: "10 белого сахара" }
+    },
+    {
+      img: "level to 50/Screw.webp", title: { ua: "10 шурупів", en: "10 screws", ru: "10 шурупов" }
+    },
+    {
+      img: "level to 50/Plank.webp", title: { ua: "10 дощок", en: "10 planks", ru: "10 досок" }
+    },
+    {
+      img: "level to 50/Bacon.webp", title: { ua: "10 бекону", en: "10 bacon", ru: "10 бекона" }
+    },
+  ],
+  100: [
+    {
+      img: "level to 100/Screw.webp", title: { ua: "10 шурупів", en: "10 screws", ru: "10 шурупов" }
+    },
+    {
+      img: "level to 100/Plank.webp", title: { ua: "10 дошок", en: "10 planks", ru: "10 досок" }
+    },
+    {
+      img: "level to 100/бобовий соус.webp", title: { ua: "10 бобового соусу", en: "10 bean sauce", ru: "10 бобового соуса" }
+    },
+    {
+      img: "level to 100/арахісові горішки з медом.webp", title: { ua: "10 арахісових горішків з медом", en: "10 peanuts with honey", ru: "10 арахисовых орехов с медом" }
+    },
+    {
+      img: "level to 100/шоколадне морозиво.webp", title: { ua: "10 шоколадного морозива", en: "10 chocolate ice cream", ru: "10 шоколадного мороженого" }
+    },
+    {
+      img: "level to 100/шоколад.webp", title: { ua: "10 шоколаду", en: "10 chocolate", ru: "10 шоколада" }
+    },
+    {
+      img: "level to 100/лимонний крем.webp", title: { ua: "10 лимонного крему", en: "10 lemon cream", ru: "10 лимонного крема" }
+    },
+    {
+      img: "level to 100/клейкова стрічка.webp", title: { ua: "10 клейкової стрічки", en: "10 packing tape", ru: "10 лент" }
+    },
+    {
+      img: "level to 100/майонез.webp", title: { ua: "10 майонезу", en: "10 mayonnaise", ru: "10 майонеза" }
+    },
+    {
+      img: "level to 100/Оливкове масло.webp", title: { ua: "10 оливкового масла", en: "10 olive oil", ru: "10 оливкового масла" }
+    },
+    {
+      img: "level to 100/свіжа паста.webp", title: { ua: "10 свіжої пасті", en: "10 fresh paste", ru: "10 свежей пасты" }
+    },
+    {
+      img: "level to 100/раки.webp", title: { ua: "10 раків", en: "10 crabs", ru: "10 раков" }
+    },
+  ],
+  126: [
+    {
+      img: "level to 126/Plank.webp", title: { ua: "10 дошок", en: "10 planks", ru: "10 досок" }
+    },
+    {
+      img: "level to 126/Screw.webp",
+      title: { ua: "10 шурупів", en: "10 screws", ru: "10 шурупов" }
+    },
+    {
+      img: "level to 126/клейкова стрічка.webp",
+      title: { ua: "10 клейкової стрічки", en: "10 packing tape", ru: "10 лент" }
+    },
+    {
+      img: "level to 126/фруктофий милкшейк.webp",
+      title: { ua: "10 фруктового милкшейку", en: "10 fruit milkshake", ru: "10 фруктового молочного коктейля" }
+    },
+    {
+      img: "level to 126/лопата.webp",
+      title: { ua: "20 лопат", en: "20 shovels", ru: "20 лопат" }
+    },
+    {
+      img: "level to 126/арахісовий ірис.webp",
+      title: { ua: "10 арахісового ірису", en: "10 peanut butter", ru: "10 арахисового ириса" }
+    },
+    {
+      img: "level to 126/вафлі з ягодами.webp",
+      title: { ua: "10 вафель з ягодами", en: "10 waffles with berries", ru: "10 вафель с ягодами" }
+    },
+    {
+      img: "level to 126/звичайний кекс.webp",
+      title: { ua: "10 звичайного кексу", en: "10 regular cake", ru: "10 обычного кекса" }
+    },
+  ]
+};
+
+/* ===== UTILS ===== */
+
 function loadData() {
   if (!fs.existsSync(DATA_FILE)) {
     return { boxes: [], results: [] };
@@ -53,100 +217,99 @@ function saveData(data) {
 }
 
 function shuffleArray(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+  return arr.sort(() => Math.random() - 0.5);
 }
 
-// ===== INIT BOXES =====
-function initBoxes() {
-  const data = loadData();
+/* ===== INIT ===== */
 
-  if (!data.boxes || data.boxes.length === 0) {
-    data.boxes = shuffleArray([...prizes]).slice(0, 8);
-    saveData(data);
+function initBoxes(level) {
+  const data = loadData();
+  const prizes = prizesByLevel[level];
+  if (!prizes) return;
+
+  const shuffled = shuffleArray([...prizes, ...prizes, ...prizes, ...prizes]);
+
+  data.boxes = [];
+
+  for (let i = 0; i < 8; i++) {
+    data.boxes.push({
+      opened: false,
+      prizes: shuffled.splice(0, 5)
+    });
   }
+
+  saveData(data);
 }
 
-initBoxes();
+/* ===== API ===== */
 
-// ===== API =====
+app.post("/api/init", (req, res) => {
+  const { level } = req.body;
 
-// GET BOXES
-app.get('/api/boxes', (req, res) => {
-  const data = loadData();
-  res.json(data.boxes);
+  saveData({ boxes: [], results: [] });
+  initBoxes(level);
+
+  res.send("Boxes initialized");
 });
 
-// GET RESULTS
-app.get('/api/results', (req, res) => {
-  const data = loadData();
-  res.json(data.results);
+app.get("/api/boxes", (req, res) => {
+  res.json(loadData().boxes);
 });
 
-// OPEN BOX
-app.post('/api/open', (req, res) => {
+app.get("/api/results", (req, res) => {
+  res.json(loadData().results);
+});
 
-  const { username, index } = req.body;
-
-  if (!username || index === undefined) {
-    return res.status(400).send('Invalid request');
-  }
+app.post("/api/open", async (req, res) => {
+  const { username, index, level, lang } = req.body;
 
   const data = loadData();
-  const prize = data.boxes[index];
+  const box = data.boxes[index];
 
-  if (!prize) {
-    return res.status(400).send('Коробка не існує');
-  }
+  if (!box) return res.status(400).send("Box not found");
+  if (box.opened) return res.status(400).send("Already opened");
+
+  box.opened = true;
 
   const result = {
     name: username,
-    prize: prize.title,
-    img: prize.img,
-    date: new Date().toLocaleString("uk-UA")
+    level,
+    prizes: box.prizes, // ⬅️ ЗБЕРІГАЄМО ВСІ МОВИ
+    date: new Date().toISOString()
   };
 
   data.results.push(result);
   saveData(data);
 
-  // ===== TELEGRAM MESSAGE =====
-  bot.sendMessage(CHAT_ID,
-`🎁 ВІДКРИТА КОРОБКА
+  /* ===== TELEGRAM ===== */
+  const t = tgTranslations[lang] || tgTranslations.ua;
 
-👤 Імʼя: ${username}
-🏆 Приз: ${prize.title}
-📦 Коробка: №${Number(index) + 1}
-🕒 ${result.date}`
-  ).catch(err => console.log("TG ERROR:", err.message));
+  const prizeList = box.prizes
+    .map(p => p.title[lang] || p.title.ua)
+    .join(", ");
 
-  res.json(prize);
+  sendToTelegram(
+`${t.opened}
+👤 ${username}
+${t.level}: ${level}
+${t.prizes}: ${prizeList}
+${t.date}: ${new Date(result.date).toLocaleString(lang)}`
+  );
+
+  /* ===== RESPONSE TO FRONT ===== */
+  res.json(
+    box.prizes.map(p => ({
+      img: p.img,
+      title: p.title[lang] || p.title.ua
+    }))
+  );
 });
 
-// RESET
-app.post('/api/reset', (req, res) => {
-
-  const { password } = req.body;
-
-  if (password !== ADMIN_PASSWORD) {
-    return res.status(403).send('Wrong password');
-  }
-
-  const data = {
-    boxes: shuffleArray([...prizes]).slice(0, 8),
-    results: []
-  };
-
-  saveData(data);
-
-  bot.sendMessage(CHAT_ID, "♻ Адмін скинув гру та перемішав коробки");
-
-  res.send('Reset done!');
+app.post("/api/reset", (req, res) => {
+  saveData({ boxes: [], results: [] });
+  res.send("Reset done");
 });
 
-// ===== START =====
 app.listen(PORT, () => {
   console.log(`SERVER STARTED → http://localhost:${PORT}`);
 });

@@ -1,20 +1,13 @@
-const BOX_COUNT = 8;
-const ADMIN_PASSWORD = "dev123";
+const boxesEl = document.getElementById("grid");
+const usernameEl = document.getElementById("name");
+const levelEl = document.getElementById("level");
+const resultsBody = document.getElementById("history");
+const resetBtn = document.getElementById("resetBtn");
 
-/* ---------- ELEMENTS ---------- */
-const boxesEl = document.getElementById('boxes');
-const usernameEl = document.getElementById('username');
-const resultsBody = document.getElementById('resultsBody');
-const statsEl = document.getElementById('stats');
-const modal = document.getElementById('modal');
-const modalContent = document.getElementById('modalContent');
-const resetBtn = document.getElementById('resetBtn');
-
-/* ---------- STATE ---------- */
 let played = localStorage.getItem("played");
-let opening = false;
 
-/* ---------- INIT ---------- */
+/* ===== INIT ===== */
+
 init();
 
 async function init() {
@@ -22,205 +15,191 @@ async function init() {
   await syncResults();
 }
 
-/* ---------- LOAD BOXES ---------- */
-async function loadBoxes() {
-  try {
-    const res = await fetch('/api/boxes');
-    const data = await res.json();
+/* ===== LANGUAGE SYSTEM ===== */
 
-    if (!data || data.length === 0) {
-      alert("Коробки ще не готові");
-      return;
-    }
-
-    renderBoxes(data);
-
-  } catch (err) {
-    console.error(err);
-    alert("Помилка завантаження коробок");
+const translations = {
+  ua: {
+    choose_box: "🎁 Обери коробку",
+    your_name: "Твоє ім'я",
+    level_50: "До 50 рівня",
+    level_100: "До 100 рівня",
+    level_126: "До 126 рівня",
+    results: "Результати",
+    name: "Імʼя",
+    level: "Рівень",
+    prizes: "Призи",
+    date: "Дата",
+    reset: "🗑 Скинути"
+  },
+  en: {
+    choose_box: "🎁 Choose a box",
+    your_name: "Your name",
+    level_50: "Up to level 50",
+    level_100: "Up to level 100",
+    level_126: "Up to level 126",
+    results: "Results",
+    name: "Name",
+    level: "Level",
+    prizes: "Prizes",
+    date: "Date",
+    reset: "🗑 Reset"
+  },
+  ru: {
+    choose_box: "🎁 Выбери коробку",
+    your_name: "Твоё имя",
+    level_50: "До 50 уровня",
+    level_100: "До 100 уровня",
+    level_126: "До 126 уровня",
+    results: "Результаты",
+    name: "Имя",
+    level: "Уровень",
+    prizes: "Призы",
+    date: "Дата",
+    reset: "🗑 Сброс"
   }
+};
+
+function setLanguage(lang) {
+  localStorage.setItem("lang", lang);
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    el.innerText = translations[lang][key];
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    el.placeholder = translations[lang][key];
+  });
 }
 
-/* ---------- RENDER BOXES ---------- */
-function renderBoxes(boxData) {
-  boxesEl.innerHTML = '';
+const savedLang = localStorage.getItem("lang") || "ua";
+setLanguage(savedLang);
 
-  boxData.forEach((_, index) => {
-    const box = document.createElement('div');
-    box.className = 'box';
+document.querySelectorAll(".lang-switch button").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    setLanguage(btn.dataset.lang);
+    await syncResults();
+  });
+});
+
+
+/* ===== LEVEL CHANGE ===== */
+
+levelEl.addEventListener("change", async () => {
+  const level = levelEl.value;
+
+  await fetch("/api/init", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ level })
+  });
+
+  localStorage.removeItem("played");
+  played = null;
+
+  await loadBoxes();
+  await syncResults();
+});
+
+/* ===== BOXES ===== */
+
+async function loadBoxes() {
+  const res = await fetch("/api/boxes");
+  const data = await res.json();
+  renderBoxes(data);
+}
+
+function renderBoxes(boxData) {
+  boxesEl.innerHTML = "";
+  boxData.forEach((boxData, index) => {
+    const box = document.createElement("div");
+    box.className = "box";
     box.dataset.index = index;
-    box.innerHTML = '🎁';
+    box.innerHTML = boxData.opened ? "❌" : "🎁";
     boxesEl.appendChild(box);
   });
 }
 
-/* ---------- CLICK ---------- */
-boxesEl.addEventListener('click', async e => {
+boxesEl.addEventListener("click", async e => {
+  if (played) return alert("You already opened a box");
 
-  if (played) {
-    alert("Ти вже відкривав коробку!");
-    return;
-  }
-
-  if (opening) return;
-
-  const box = e.target.closest('.box');
+  const box = e.target.closest(".box");
   if (!box) return;
 
   const username = usernameEl.value.trim();
+  const level = levelEl.value;
+  const lang = localStorage.getItem("lang") || "ua";
 
-  if (username.length < 3) {
-    alert("Мінімум 3 символи");
-    return;
-  }
+  if (username.length < 3) return alert("Minimum 3 characters");
 
-  opening = true;
-  const index = box.dataset.index;
+  const res = await fetch("/api/open", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      username,
+      index: box.dataset.index,
+      level,
+      lang
+    })
+  });
 
-  try {
+  if (!res.ok) return alert(await res.text());
 
-    const res = await fetch('/api/open', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, index })
-    });
-
-    if (!res.ok) {
-      opening = false;
-      alert(await res.text());
-      return;
-    }
-
-    const prize = await res.json();
-
-    openBox(box, prize);
-    await syncResults();
-
-  } catch (err) {
-    console.error(err);
-    alert("Помилка при відкритті");
-  }
-
-  opening = false;
-});
-
-/* ---------- OPEN ---------- */
-function openBox(box, prize) {
+  const prizes = await res.json();
 
   played = true;
   localStorage.setItem("played", "true");
 
-  box.classList.add('opened');
+  box.classList.add("opened");
+  box.innerHTML = prizes.map(p => `
+    <div class="prize-item">
+      <img src="${p.img}" class="prize-img">
+      <div>${p.title}</div>
+    </div>
+  `).join("");
 
-  box.innerHTML = `
-    <img src="${prize.img}" class="prize-img">
-    <span>${prize.title}</span>
-  `;
+  await syncResults();
+});
 
-  showModal(prize);
-}
+/* ===== RESULTS ===== */
 
-/* ---------- SYNC RESULTS ---------- */
 async function syncResults() {
+  const res = await fetch("/api/results");
+  const data = await res.json();
 
-  try {
+  const lang = localStorage.getItem("lang") || "ua";
 
-    const res = await fetch('/api/results');
-    const data = await res.json();
+  resultsBody.innerHTML = "";
 
-    resultsBody.innerHTML = '';
-    statsEl.innerHTML = '';
+  data.forEach(r => {
+    const tr = document.createElement("tr");
 
-    const stats = {};
+    tr.innerHTML = `
+      <td>${r.name}</td>
+      <td>${r.level}</td>
+      <td>${r.prizes.map(p => p.title[lang] || p.title.ua).join(", ")}</td>
+      <td>${new Date(r.date).toLocaleString(lang)}</td>
+    `;
 
-    data.forEach(r => {
-      addRow(r);
-      stats[r.prize] = (stats[r.prize] || 0) + 1;
-    });
-
-    Object.entries(stats).forEach(([name, count]) => {
-      const li = document.createElement('li');
-      li.textContent = `${name}: ${count}`;
-      statsEl.appendChild(li);
-    });
-
-  } catch (err) {
-    console.error(err);
-  }
+    resultsBody.appendChild(tr);
+  });
 }
 
-/* ---------- TABLE ---------- */
-function addRow({ name, prize, img, date }) {
+/* ===== ADMIN ===== */
 
-  const tr = document.createElement('tr');
-
-  tr.innerHTML = `
-    <td>${name}</td>
-    <td>
-      <img src="${img}" class="table-img">
-      ${prize}
-    </td>
-    <td>${date}</td>
-  `;
-
-  resultsBody.appendChild(tr);
-}
-
-/* ---------- MODAL ---------- */
-function showModal(prize) {
-
-  modalContent.innerHTML = `
-    <h3>🎉 Вітаємо!</h3>
-    <img src="${prize.img}" class="prize-img">
-    <p>${prize.title}</p>
-    <button onclick="closeModal()">OK</button>
-  `;
-
-  modal.classList.add('active');
-}
-
-function closeModal() {
-  modal.classList.remove('active');
-}
-
-/* ---------- ADMIN RESET ---------- */
-resetBtn.onclick = async () => {
-
-  const pass = prompt("Пароль:");
-  if (!pass) return;
-
-  const confirmReset = confirm("Скинути гру?");
-  if (!confirmReset) return;
-
-  try {
-
-    const res = await fetch('/api/reset', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pass })
-    });
-
-    if (!res.ok) {
-      alert(await res.text());
-      return;
-    }
-
-    localStorage.removeItem("played");
-    alert("Гру скинуто!");
-    location.reload();
-
-  } catch (err) {
-    console.error(err);
-    alert("Помилка reset");
-  }
-};
-
-/* ---------- SECRET ADMIN ---------- */
-document.addEventListener('keydown', e => {
-
+document.addEventListener("keydown", e => {
   if (e.ctrlKey && e.key.toLowerCase() === "a") {
     resetBtn.style.display = "block";
-    console.log("ADMIN MODE ENABLED");
   }
-
 });
+
+resetBtn.onclick = async () => {
+  if (!confirm("Reset game?")) return;
+
+  const res = await fetch("/api/reset", { method: "POST" });
+
+  alert(await res.text());
+  localStorage.removeItem("played");
+  location.reload();
+};

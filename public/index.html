@@ -1,39 +1,52 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Призи в коробках</title>
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<title>Prizes</title>
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <h1>Обери одну коробку</h1>
-  <p>Можна вибрати одну коробку</p>
 
-  <input id="username" placeholder="Введи своє імʼя">
+<div class="container">
 
-  <div class="boxes" id="boxes"></div>
+<div class="lang-switch">
+  <button data-lang="ua">UA</button>
+  <button data-lang="en">EN</button>
+  <button data-lang="ru">RU</button>
+</div>
 
-  <h2>Результати</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Імʼя користувача</th>
-        <th>Приз</th>
-        <th>Дата</th>
-      </tr>
-    </thead>
-    <tbody id="resultsBody"></tbody>
-  </table>
+<h1 data-i18n="choose_box">🎁 Обери коробку</h1>
 
-  <button id="resetBtn" class="admin-reset">🗑 Admin Reset</button>
+<div class="controls">
+<input id="name" data-i18n-placeholder="your_name" placeholder="Твоє ім'я">
 
-  <h3>Статистика</h3>
-  <ul id="stats"></ul>
+<select id="level">
+<option value="50" data-i18n="level_50">До 50 рівня</option>
+<option value="100" data-i18n="level_100">До 100 рівня</option>
+<option value="126" data-i18n="level_126">До 126 рівня</option>
+</select>
+</div>
 
-  <div class="modal" id="modal">
-    <div class="modal-content" id="modalContent"></div>
-  </div>
-  <script src="./main.js"></script>
+<div id="grid" class="grid"></div>
+
+<h2 data-i18n="results">Результати</h2>
+
+<table>
+<thead>
+<tr>
+<th data-i18n="name">Імʼя</th>
+<th data-i18n="level">Рівень</th>
+<th data-i18n="prizes">Призи</th>
+<th data-i18n="date">Дата</th>
+</tr>
+</thead>
+<tbody id="history"></tbody>
+</table>
+
+</div>
+
+<button id="resetBtn" data-i18n="reset">🗑 Reset</button>
+
+<script src="./main.js"></script>
 </body>
 </html>
